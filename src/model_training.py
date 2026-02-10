@@ -27,11 +27,10 @@ def load_processed_data(filepath: str) -> Tuple[pd.DataFrame, pd.Series]:
     """
     df = pd.read_csv(filepath)
 
-    # Séparer features et target
-    X = df.drop(["PassengerId", "Survived"], axis=1)
-    y = df["Survived"]
+    X = df.drop(['PassengerId', 'Survived'], axis=1)
+    y = df['Survived']
 
-    print(f"✓ Données chargées: {X.shape[0]} exemples, {X.shape[1]} features")
+    print("Données chargées: {} exemples, {} features".format(X.shape[0], X.shape[1]))
     return X, y
 
 
@@ -45,9 +44,13 @@ def create_model(random_state: int = 42) -> LogisticRegression:
     Returns:
         Instance du modèle LogisticRegression
     """
-    model = LogisticRegression(max_iter=1000, random_state=random_state, solver="liblinear")
+    model = LogisticRegression(
+        max_iter=1000,
+        random_state=random_state,
+        solver='liblinear'
+    )
 
-    print("✓ Modèle créé: Logistic Regression")
+    print("Modèle créé: Logistic Regression")
     return model
 
 
@@ -67,15 +70,13 @@ def train_model(model: Any, X: pd.DataFrame, y: pd.Series) -> Any:
     print("ENTRAÎNEMENT DU MODÈLE")
     print("=" * 50 + "\n")
 
-    # Entraîner
     model.fit(X, y)
 
-    # Évaluer avec validation croisée
-    cv_scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
+    cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
 
-    print("✓ Modèle entraîné")
-    print(f"✓ Cross-validation scores: {cv_scores}")
-    print(f"✓ Accuracy moyenne: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
+    print("Modèle entraîné")
+    print("Cross-validation scores: {}".format(cv_scores))
+    print("Accuracy moyenne: {:.4f} (+/- {:.4f})".format(cv_scores.mean(), cv_scores.std()))
 
     return model
 
@@ -98,9 +99,10 @@ def evaluate_model(model: Any, X: pd.DataFrame, y: pd.Series) -> float:
     print("\n" + "=" * 50)
     print("ÉVALUATION DU MODÈLE")
     print("=" * 50 + "\n")
-    print(f"Accuracy: {accuracy:.4f}")
+    print("Accuracy: {:.4f}".format(accuracy))
     print("\nRapport de classification:")
-    print(classification_report(y, predictions, target_names=["Décédé", "Survécu"]))
+    print(classification_report(y, predictions,
+                                target_names=['Décédé', 'Survécu']))
 
     return accuracy
 
@@ -113,14 +115,12 @@ def save_model(model: Any, filepath: str) -> None:
         model: Modèle à sauvegarder
         filepath: Chemin de sauvegarde
     """
-    # Créer le dossier si nécessaire
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
-    # Sauvegarder avec pickle
-    with open(filepath, "wb") as f:
+    with open(filepath, 'wb') as f:
         pickle.dump(model, f)
 
-    print(f"\n✓ Modèle sauvegardé: {filepath}")
+    print("\nModèle sauvegardé: {}".format(filepath))
 
 
 def load_model(filepath: str) -> Any:
@@ -133,10 +133,10 @@ def load_model(filepath: str) -> Any:
     Returns:
         Modèle chargé
     """
-    with open(filepath, "rb") as f:
+    with open(filepath, 'rb') as f:
         model = pickle.load(f)
 
-    print(f"✓ Modèle chargé: {filepath}")
+    print("Modèle chargé: {}".format(filepath))
     return model
 
 
@@ -152,12 +152,14 @@ def predict(model: Any, X: pd.DataFrame) -> np.ndarray:
         Array des prédictions
     """
     predictions = model.predict(X)
-    print(f"✓ {len(predictions)} prédictions générées")
+    print("{} prédictions générées".format(len(predictions)))
 
     return predictions
 
 
-def training_pipeline(train_data_path: str, model_output_path: str, test_size: float = 0.2) -> None:
+def training_pipeline(train_data_path: str,
+                      model_output_path: str,
+                      test_size: float = 0.2) -> None:
     """
     Pipeline complet d'entraînement.
 
@@ -170,22 +172,19 @@ def training_pipeline(train_data_path: str, model_output_path: str, test_size: f
     print("PIPELINE D'ENTRAÎNEMENT")
     print("=" * 50 + "\n")
 
-    # Charger les données
     X, y = load_processed_data(train_data_path)
 
-    # Split train/validation
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=test_size, random_state=42, stratify=y)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X, y, test_size=test_size, random_state=42, stratify=y
+    )
 
-    print(f"✓ Split: {len(X_train)} train, {len(X_val)} validation")
+    print("Split: {} train, {} validation".format(len(X_train), len(X_val)))
 
-    # Créer et entraîner le modèle
     model = create_model()
     model = train_model(model, X_train, y_train)
 
-    # Évaluer sur validation
     evaluate_model(model, X_val, y_val)
 
-    # Sauvegarder
     save_model(model, model_output_path)
 
     print("\n" + "=" * 50)
@@ -194,7 +193,7 @@ def training_pipeline(train_data_path: str, model_output_path: str, test_size: f
 
 
 if __name__ == "__main__":
-    # Exécution du pipeline
     training_pipeline(
-        train_data_path="data/processed/train_processed.csv", model_output_path="models/titanic_model.pkl"
+        train_data_path="data/processed/train_processed.csv",
+        model_output_path="models/titanic_model.pkl"
     )

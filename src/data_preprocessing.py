@@ -23,7 +23,7 @@ def load_data(train_path: str, test_path: str) -> Tuple[pd.DataFrame, pd.DataFra
     train_df = pd.read_csv(train_path)
     test_df = pd.read_csv(test_path)
 
-    print("✓ Données chargées: {} train, {} test".format(len(train_df), len(test_df)))
+    print("Données chargées: {} train, {} test".format(len(train_df), len(test_df)))
     return train_df, test_df
 
 
@@ -46,7 +46,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     df['Has_Cabin'] = df['Cabin'].notna().astype(int)
     df = df.drop('Cabin', axis=1)
 
-    print("✓ Valeurs manquantes traitées")
+    print("Valeurs manquantes traitées")
     return df
 
 
@@ -75,7 +75,7 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
     df['Title'] = df['Title'].replace('Ms', 'Miss')
     df['Title'] = df['Title'].replace('Mme', 'Mrs')
 
-    print("✓ Features créées: FamilySize, IsAlone, Title")
+    print("Features créées: FamilySize, IsAlone, Title")
     return df
 
 
@@ -97,7 +97,7 @@ def encode_categorical(df: pd.DataFrame) -> pd.DataFrame:
     title_dummies = pd.get_dummies(df['Title'], prefix='Title')
     df = pd.concat([df, title_dummies], axis=1)
 
-    print("✓ Variables catégorielles encodées")
+    print("Variables catégorielles encodées")
     return df
 
 
@@ -125,7 +125,7 @@ def select_features(df: pd.DataFrame, is_train: bool = True) -> pd.DataFrame:
         features.insert(0, 'PassengerId')
 
     df_selected = df[features].copy()
-    print("✓ {} features sélectionnées".format(len(features)))
+    print("{} features sélectionnées".format(len(features)))
 
     return df_selected
 
@@ -162,7 +162,7 @@ def preprocess_pipeline(train_path: str, test_path: str,
     train_processed.to_csv(output_train, index=False)
     test_processed.to_csv(output_test, index=False)
 
-    print("\n✓ Données sauvegardées:")
+    print("\nDonnées sauvegardées:")
     print("  - Train: {}".format(output_train))
     print("  - Test: {}".format(output_test))
     print("\n" + "=" * 50 + "\n")
