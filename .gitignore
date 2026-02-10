@@ -16,9 +16,8 @@ dist/
 .ipynb_checkpoints
 
 # Data files
-*.csv
-!data/raw/*.csv
 data/processed/*.csv
+*.pkl
 
 # Models
 *.pkl
