@@ -196,7 +196,6 @@ def evaluation_pipeline(
 
     # Faire des prédictions
     predictions = model.predict(X_test)
-    probabilities = model.predict_proba(X_test)[:, 1]
 
     print(f"✓ Prédictions générées: {len(predictions)} exemples")
 

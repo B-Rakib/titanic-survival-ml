@@ -4,13 +4,19 @@ Tests unitaires pour le module model_training.
 
 import sys
 import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from model_training import create_model, train_model, save_model, load_model, predict
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+from model_training import (
+    create_model,
+    train_model,
+    save_model,
+    load_model,
+    predict
+)
 
 
 class TestCreateModel:
@@ -39,8 +45,8 @@ class TestTrainModel:
         model = create_model()
         model = train_model(model, X, y)
 
-        assert hasattr(model, "coef_")
-        assert hasattr(model, "intercept_")
+        assert hasattr(model, 'coef_')
+        assert hasattr(model, 'intercept_')
 
 
 class TestSaveLoadModel:
@@ -60,7 +66,7 @@ class TestSaveLoadModel:
         loaded_model = load_model(str(model_path))
 
         assert isinstance(loaded_model, LogisticRegression)
-        assert hasattr(loaded_model, "coef_")
+        assert hasattr(loaded_model, 'coef_')
 
 
 class TestPredict:

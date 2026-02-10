@@ -47,7 +47,7 @@ def create_model(random_state: int = 42) -> LogisticRegression:
     """
     model = LogisticRegression(max_iter=1000, random_state=random_state, solver="liblinear")
 
-    print(f"✓ Modèle créé: Logistic Regression")
+    print("✓ Modèle créé: Logistic Regression")
     return model
 
 
@@ -73,7 +73,7 @@ def train_model(model: Any, X: pd.DataFrame, y: pd.Series) -> Any:
     # Évaluer avec validation croisée
     cv_scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 
-    print(f"✓ Modèle entraîné")
+    print("✓ Modèle entraîné")
     print(f"✓ Cross-validation scores: {cv_scores}")
     print(f"✓ Accuracy moyenne: {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
 

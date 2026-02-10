@@ -4,12 +4,15 @@ Tests unitaires pour le module model_evaluation.
 
 import sys
 import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-
 import pandas as pd
 import numpy as np
-from model_evaluation import calculate_metrics, create_submission
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+from model_evaluation import (
+    calculate_metrics,
+    create_submission
+)
 
 
 class TestCalculateMetrics:
@@ -23,10 +26,10 @@ class TestCalculateMetrics:
         metrics = calculate_metrics(y_true, y_pred)
 
         assert isinstance(metrics, dict)
-        assert "accuracy" in metrics
-        assert "precision" in metrics
-        assert "recall" in metrics
-        assert "f1_score" in metrics
+        assert 'accuracy' in metrics
+        assert 'precision' in metrics
+        assert 'recall' in metrics
+        assert 'f1_score' in metrics
 
     def test_metrics_values_valid(self):
         """Vérifie que les métriques sont entre 0 et 1."""
@@ -62,7 +65,7 @@ class TestCreateSubmission:
 
         df = pd.read_csv(output_path)
 
-        assert "PassengerId" in df.columns
-        assert "Survived" in df.columns
+        assert 'PassengerId' in df.columns
+        assert 'Survived' in df.columns
         assert len(df) == 4
-        assert df["Survived"].isin([0, 1]).all()
+        assert df['Survived'].isin([0, 1]).all()

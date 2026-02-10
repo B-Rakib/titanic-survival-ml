@@ -23,7 +23,7 @@ def load_data(train_path: str, test_path: str) -> Tuple[pd.DataFrame, pd.DataFra
     train_df = pd.read_csv(train_path)
     test_df = pd.read_csv(test_path)
 
-    print(f"✓ Données chargées: {len(train_df)} train, {len(test_df)} test")
+    print("✓ Données chargées: {} train, {} test".format(len(train_df), len(test_df)))
     return train_df, test_df
 
 
@@ -39,20 +39,14 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
 
-    # Age: remplacer par la médiane
-    df["Age"] = df["Age"].fillna(df["Age"].median())
+    df['Age'] = df['Age'].fillna(df['Age'].median())
+    df['Embarked'] = df['Embarked'].fillna(df['Embarked'].mode()[0])
+    df['Fare'] = df['Fare'].fillna(df['Fare'].median())
 
-    # Embarked: remplacer par le mode
-    df["Embarked"] = df["Embarked"].fillna(df["Embarked"].mode()[0])
+    df['Has_Cabin'] = df['Cabin'].notna().astype(int)
+    df = df.drop('Cabin', axis=1)
 
-    # Fare: remplacer par la médiane
-    df["Fare"] = df["Fare"].fillna(df["Fare"].median())
-
-    # Cabin: créer une feature binaire
-    df["Has_Cabin"] = df["Cabin"].notna().astype(int)
-    df = df.drop("Cabin", axis=1)
-
-    print(f"✓ Valeurs manquantes traitées")
+    print("✓ Valeurs manquantes traitées")
     return df
 
 
@@ -68,24 +62,20 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
 
-    # FamilySize: SibSp + Parch + 1
-    df["FamilySize"] = df["SibSp"] + df["Parch"] + 1
+    df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
+    df['IsAlone'] = (df['FamilySize'] == 1).astype(int)
 
-    # IsAlone: 1 si seul, 0 sinon
-    df["IsAlone"] = (df["FamilySize"] == 1).astype(int)
+    df['Title'] = df['Name'].str.extract(r' ([A-Za-z]+)\.', expand=False)
 
-    # Title: extraire de Name
-    df["Title"] = df["Name"].str.extract(" ([A-Za-z]+)\.", expand=False)
-
-    # Simplifier les titres rares
-    df["Title"] = df["Title"].replace(
-        ["Lady", "Countess", "Capt", "Col", "Don", "Dr", "Major", "Rev", "Sir", "Jonkheer", "Dona"], "Rare"
+    df['Title'] = df['Title'].replace(
+        ['Lady', 'Countess', 'Capt', 'Col', 'Don', 'Dr', 'Major',
+         'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare'
     )
-    df["Title"] = df["Title"].replace("Mlle", "Miss")
-    df["Title"] = df["Title"].replace("Ms", "Miss")
-    df["Title"] = df["Title"].replace("Mme", "Mrs")
+    df['Title'] = df['Title'].replace('Mlle', 'Miss')
+    df['Title'] = df['Title'].replace('Ms', 'Miss')
+    df['Title'] = df['Title'].replace('Mme', 'Mrs')
 
-    print(f"✓ Features créées: FamilySize, IsAlone, Title")
+    print("✓ Features créées: FamilySize, IsAlone, Title")
     return df
 
 
@@ -101,17 +91,13 @@ def encode_categorical(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
 
-    # Sex: Male=1, Female=0
-    df["Sex"] = df["Sex"].map({"male": 1, "female": 0})
+    df['Sex'] = df['Sex'].map({'male': 1, 'female': 0})
+    df['Embarked'] = df['Embarked'].map({'C': 0, 'Q': 1, 'S': 2})
 
-    # Embarked: C=0, Q=1, S=2
-    df["Embarked"] = df["Embarked"].map({"C": 0, "Q": 1, "S": 2})
-
-    # Title: One-hot encoding
-    title_dummies = pd.get_dummies(df["Title"], prefix="Title")
+    title_dummies = pd.get_dummies(df['Title'], prefix='Title')
     df = pd.concat([df, title_dummies], axis=1)
 
-    print(f"✓ Variables catégorielles encodées")
+    print("✓ Variables catégorielles encodées")
     return df
 
 
@@ -126,27 +112,26 @@ def select_features(df: pd.DataFrame, is_train: bool = True) -> pd.DataFrame:
     Returns:
         DataFrame avec features sélectionnées
     """
-    # Features à garder
-    features = ["Pclass", "Sex", "Age", "Fare", "Embarked", "FamilySize", "IsAlone", "Has_Cabin"]
+    features = ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked',
+                'FamilySize', 'IsAlone', 'Has_Cabin']
 
-    # Ajouter les colonnes Title_*
-    title_cols = [col for col in df.columns if col.startswith("Title_")]
+    title_cols = [col for col in df.columns if col.startswith('Title_')]
     features.extend(title_cols)
 
-    if is_train and "Survived" in df.columns:
-        features.insert(0, "Survived")
+    if is_train and 'Survived' in df.columns:
+        features.insert(0, 'Survived')
 
-    # Garder PassengerId pour la soumission
-    if "PassengerId" in df.columns:
-        features.insert(0, "PassengerId")
+    if 'PassengerId' in df.columns:
+        features.insert(0, 'PassengerId')
 
     df_selected = df[features].copy()
-    print(f"✓ {len(features)} features sélectionnées")
+    print("✓ {} features sélectionnées".format(len(features)))
 
     return df_selected
 
 
-def preprocess_pipeline(train_path: str, test_path: str, output_train: str, output_test: str) -> None:
+def preprocess_pipeline(train_path: str, test_path: str,
+                        output_train: str, output_test: str) -> None:
     """
     Pipeline complet de prétraitement.
 
@@ -160,40 +145,33 @@ def preprocess_pipeline(train_path: str, test_path: str, output_train: str, outp
     print("PRÉTRAITEMENT DES DONNÉES")
     print("=" * 50 + "\n")
 
-    # Charger
     train_df, test_df = load_data(train_path, test_path)
 
-    # Traiter valeurs manquantes
     train_df = handle_missing_values(train_df)
     test_df = handle_missing_values(test_df)
 
-    # Créer features
     train_df = create_features(train_df)
     test_df = create_features(test_df)
 
-    # Encoder
     train_df = encode_categorical(train_df)
     test_df = encode_categorical(test_df)
 
-    # Sélectionner features
     train_processed = select_features(train_df, is_train=True)
     test_processed = select_features(test_df, is_train=False)
 
-    # Sauvegarder
     train_processed.to_csv(output_train, index=False)
     test_processed.to_csv(output_test, index=False)
 
-    print(f"\n✓ Données sauvegardées:")
-    print(f"  - Train: {output_train}")
-    print(f"  - Test: {output_test}")
+    print("\n✓ Données sauvegardées:")
+    print("  - Train: {}".format(output_train))
+    print("  - Test: {}".format(output_test))
     print("\n" + "=" * 50 + "\n")
 
 
 if __name__ == "__main__":
-    # Exécution du pipeline
     preprocess_pipeline(
         train_path="data/raw/train.csv",
         test_path="data/raw/test.csv",
         output_train="data/processed/train_processed.csv",
-        output_test="data/processed/test_processed.csv",
+        output_test="data/processed/test_processed.csv"
     )
