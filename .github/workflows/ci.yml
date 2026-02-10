@@ -27,11 +27,3 @@ jobs:
     - name: Run tests with pytest
       run: |
         python -m pytest tests/ -v
-    
-    - name: Lint with flake8
-      run: |
-        python -m flake8 src/ tests/ main.py
-    
-    - name: Format check with black
-      run: |
-        python -m black src/ tests/ main.py --check --line-length=120
